@@ -22,4 +22,22 @@ subprojects {
         compileOnly(kotlin("stdlib"))
         compileOnly(fileTree("libs"))
     }
+
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
+    }
+
+    configure<JavaPluginConvention> {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    tasks.register<Copy>("collectJar") {
+        into("${rootProject.buildDir}/libs")
+        from("${project.buildDir}/libs")
+    }
+}
+
+gradle.buildFinished {
+    buildDir.deleteRecursively()
 }
