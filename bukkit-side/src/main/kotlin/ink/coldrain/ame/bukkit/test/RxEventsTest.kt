@@ -1,8 +1,20 @@
 package ink.coldrain.ame.bukkit.test
 
+import ink.coldrain.ame.bukkit.utils.Events
 import ink.coldrain.ame.bukkit.utils.RxEvents
+import ink.coldrain.ame.bukkit.utils.asyncEvent
+import ink.coldrain.ame.bukkit.utils.subscribe
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import org.bukkit.event.player.PlayerBedEnterEvent
+import org.bukkit.event.player.PlayerBedLeaveEvent
+import taboolib.common.platform.event.SubscribeEvent
 
 /**
  * ink.coldrain.ame.bukkit.test.RxEventsTest
@@ -34,4 +46,31 @@ fun test() {
     }.subscribe {
         println(it)
     }
+
+    RxEvents.create(PlayerBedEnterEvent::class) {
+        player.sendMessage("做个好梦")
+        return@create player.location
+    }.then({ e: PlayerBedEnterEvent, ev: PlayerBedLeaveEvent -> e.player.uniqueId == ev.player.uniqueId }) { loc ->
+        println(loc)
+    }.subscribe()
+}
+
+suspend fun getSleepTime(player: Player): Long {
+    // 上床时间
+    val time = asyncEvent<PlayerBedEnterEvent, Long> {
+        identifier { player.uniqueId == it.player.uniqueId }
+        executor {
+            player.sendMessage("晚安")
+            return@executor System.currentTimeMillis()
+        }
+    }
+    // 起床时间
+    val time2 = asyncEvent<PlayerBedLeaveEvent, Long> {
+        identifier { player.uniqueId == it.player.uniqueId }
+        executor {
+            player.sendMessage("早安")
+            return@executor System.currentTimeMillis()
+        }
+    }
+    return time - time2
 }

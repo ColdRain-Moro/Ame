@@ -42,3 +42,32 @@ RxEvents.create(AsyncPlayerChatEvent::class) {
     println(it)
 }
 ~~~
+
+### 可挂起的事件订阅封装
+
+~~~kotlin
+suspend fun getSleepTime(player: Player): Long {
+    // 上床时间
+    val time = asyncEvent<PlayerBedEnterEvent, Long> {
+        identifier { player.uniqueId == it.player.uniqueId }
+        executor {
+            player.sendMessage("晚安")
+            return@executor System.currentTimeMillis()
+        }
+    }
+    // 起床时间
+    val time2 = asyncEvent<PlayerBedLeaveEvent, Long> {
+        identifier { player.uniqueId == it.player.uniqueId }
+        executor {
+            player.sendMessage("早安")
+            return@executor System.currentTimeMillis()
+        }
+    }
+    return time - time2
+}
+~~~
+
+在协程作用域中，你可以使用`asyncEvent`订阅一个仅执行一次的事件，并获取它的返回值。在事件触发并被处理完成之前，它会一直挂起。
+怎么样？是不是看起来更加直观？
+
+

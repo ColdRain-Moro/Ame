@@ -5,7 +5,7 @@ dependencies {
     compileOnly("ink.ptms.core:v11200:11200")
     compileOnly("ink.ptms.core:v11701:11701-minimize:mapped")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
 
     implementation("io.izzel:taboolib:${taboolibVersion}:common")
     implementation("io.izzel:taboolib:${taboolibVersion}:common-5")

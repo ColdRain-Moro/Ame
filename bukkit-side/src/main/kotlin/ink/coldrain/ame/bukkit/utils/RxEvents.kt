@@ -43,7 +43,7 @@ class RxEvents<P, E: Event, N> internal constructor(
      * 订阅之前积累的所有事件链
      */
     @Suppress("UNCHECKED_CAST")
-    fun subscribe() {
+    fun subscribe(consumer: (N) -> Unit = {}) {
         // 递归到最上层
         previous?.let {
             it.subscribe()
@@ -51,24 +51,6 @@ class RxEvents<P, E: Event, N> internal constructor(
         }
         Events.subscribe(getEventClass<E>(), Consumer {
             subscribeNext(it.subscriber(Unit as P), it)
-        })
-    }
-
-    /**
-     * 订阅积累的事件链并传入一个处理最终的返回值的回调
-     *
-     * @param consumer
-     * @receiver
-     */
-    @Suppress("UNCHECKED_CAST")
-    fun subscribe(consumer: (N) -> Unit) {
-        // 递归到最上层
-        previous?.let {
-            it.subscribe()
-            return
-        }
-        Events.subscribe(getEventClass<E>(), Consumer {
-            consumer(it.subscriber(Unit as P))
         })
     }
 
@@ -107,8 +89,9 @@ class RxEvents<P, E: Event, N> internal constructor(
     }
 
     companion object {
-        fun <E: Event, N> create(eventClazz: KClass<E>, subscriber: E.(Unit) -> N): RxEvents<Unit, E, N> {
-            return RxEvents(null, null, subscriber)
+        fun <E: Event, N> create(eventClazz: KClass<E>, subscriber: E.() -> N): RxEvents<Unit, E, N> {
+            val theSubscriber: E.(Unit) -> N = { subscriber() }
+            return RxEvents(null, null, theSubscriber)
         }
     }
 }
