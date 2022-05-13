@@ -1,4 +1,4 @@
-package ink.coldrain.ame.bukkit.utils
+package ink.coldrain.ame.bukkit.events
 
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority

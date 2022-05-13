@@ -9,6 +9,12 @@
 - common 通用工具
 - bukkit-side bukkit平台工具
 
+## 计划
+
+- [x] RxJava & 协程风格链条式事件订阅封装
+- [ ] taboolib database orm+解耦封装 (MySQL/SQLite两种方式只用写一个类)
+- [ ] redis封装
+
 ## 有趣的工具
 
 ### RxJava风格的事件订阅封装
@@ -69,5 +75,65 @@ suspend fun getSleepTime(player: Player): Long {
 
 在协程作用域中，你可以使用`asyncEvent`订阅一个仅执行一次的事件，并获取它的返回值。在事件触发并被处理完成之前，它会一直挂起。
 怎么样？是不是看起来更加直观？
+
+### 面向对象的TabooLib数据库操作封装
+
+~~~kotlin
+@TableName("data")
+data class DataEntity(
+    @VarChar(32)
+    @Unique
+    private val uuid: String,
+    // 不使用@VarChar注解则会推断为TEXT
+    val name: String,
+    @Nullable
+    @ColumnName("optional_props")
+    // 不使用@Nullable注解则默认非空
+    val optionalProps: String?,
+    // 序列化为json格式存储
+    @SerializeAs(SerializeType.JSON)
+    val profile: Profile
+) : IntIdEntity() {
+    // transform
+    val uniqueId: UUID
+        get() = UUID.fromString(uuid)
+}
+
+data class Profile(
+    val health: Double,
+    val level: Int,
+    val prefix: String
+)
+
+@Config
+lateinit var conf: Configuration
+    private set
+
+fun test() {
+    // SQL
+    val type = conf.getString("database-type")
+    val host = if (type?.uppercase() == "SQL") conf.getHost("sql-options") else File(getDataFolder(), "sqlite.db").getHost()
+    val source = host.createDataSource()
+    val table = host.createTable(DataEntity::class, source)
+    // 增删查改
+    val entity = DataEntity(
+        UUID.randomUUID().toString(),
+        "Ame",
+        null,
+        Profile(20.0, 10, "雨")
+    )
+    table.insert(entity)
+    table.delete { where { "uuid" eq entity.uniqueId } }
+    val entities: List<DataEntity> = table.select { where { "name" like "Ame" } }
+    table.update {
+        where { "uuid" eq entity.uniqueId }
+        set("name", "Rain")
+    }
+}
+~~~
+
+Ame允许你使用一个数据类搭配注解来定义表的结构，并且对SQLite与MySQL做了统一的兼容操作
+
+只需一份代码，便可以在两种数据库中运行你的数据库逻辑！
 
 

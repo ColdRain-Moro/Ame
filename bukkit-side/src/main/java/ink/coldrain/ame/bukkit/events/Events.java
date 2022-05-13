@@ -1,4 +1,4 @@
-package ink.coldrain.ame.bukkit.utils;
+package ink.coldrain.ame.bukkit.events;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
