@@ -32,9 +32,23 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    tasks.register<Copy>("collectJar") {
-        into("${rootProject.buildDir}/libs")
-        from("${project.buildDir}/libs")
+    tasks {
+        val collectJar = register<Copy>("collectJar") {
+            into(File(rootProject.rootDir, "libs"))
+            from(File(project.buildDir, "libs"))
+        }
+        build {
+            dependsOn(collectJar)
+        }
+    }
+}
+
+tasks {
+    val cleanLibs = register<Delete>("cleanLibs") {
+        delete("${project.rootDir}/libs")
+    }
+    clean {
+        dependsOn(cleanLibs)
     }
 }
 

@@ -1,20 +1,12 @@
-package ink.coldrain.ame.bukkit.test
+package ink.coldrain.ame.bukkit.test.events
 
-import ink.coldrain.ame.bukkit.utils.Events
-import ink.coldrain.ame.bukkit.utils.RxEvents
-import ink.coldrain.ame.bukkit.utils.asyncEvent
-import ink.coldrain.ame.bukkit.utils.subscribe
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.bukkit.Bukkit
-import org.bukkit.Location
+import ink.coldrain.ame.bukkit.events.RxEvents
+import ink.coldrain.ame.bukkit.events.asyncEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerBedEnterEvent
 import org.bukkit.event.player.PlayerBedLeaveEvent
-import taboolib.common.platform.event.SubscribeEvent
 
 /**
  * ink.coldrain.ame.bukkit.test.RxEventsTest
